@@ -8,6 +8,30 @@ namespace UnitTests.Domain.Utility;
 public class CinemaUtilityTest
 {
     [TestMethod]
+    public void GetNewSeatPositionRowLabel_GivenSeatPosition_ReturnsCorrectSeatPositionRowLabel()
+    {
+        
+    }
+    
+    [TestMethod]
+    public void GetSeatPositionNumber_GivenSeatPosition_ReturnsCorrectSeatPositionNumber()
+    {
+        
+    }
+    
+    [TestMethod]
+    public void GetNewBookingId_GivenCinemaBookings_ReturnsNewBookingId()
+    {
+        
+    }
+    
+    [TestMethod]
+    public void GetMiddleSeatNumber_GivenSeatsCountInCurrentRowAndNumberOfTicketsToBook_ReturnsCorrectMiddleSeatNumber()
+    {
+        
+    }
+    
+    [TestMethod]
     [DataRow("", false)]
     public void AreCinemaDetailsValid_GivenCinemaDetails_ReturnsCorrectBooleanValue(
         string cinemaDetails,

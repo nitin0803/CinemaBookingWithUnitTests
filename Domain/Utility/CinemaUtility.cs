@@ -5,9 +5,9 @@ namespace Domain.Utility;
 
 public static class CinemaUtility
 {
-    public static char GetNewSeatPositionRowLabel(string newSeatPosition) => newSeatPosition.Substring(0, 1)[0];
+    public static char GetSeatPositionRowLabel(string newSeatPosition) => newSeatPosition.Substring(0, 1)[0];
     
-    public static int GetNewSeatPositionNumber(string newSeatPosition) => Convert.ToInt32(newSeatPosition.Substring(1));
+    public static int GetSeatPositionNumber(string newSeatPosition) => Convert.ToInt32(newSeatPosition.Substring(1));
 
     public static string GetNewBookingId(IReadOnlyList<Booking> currentBookings)
     {
@@ -18,11 +18,11 @@ public static class CinemaUtility
         return "GIC" + (lastBookingNumber + 1).ToString("D4");
     }
 
-    public static int GetMiddleSeatNumber(int seatsInCurrentRow, int numberOfTickets)
+    public static int GetMiddleSeatNumber(int seatsCountInCurrentRow, int numberOfTickets)
     {
-        if (seatsInCurrentRow % 2 != 0) return (seatsInCurrentRow / 2) + 1;
+        if (seatsCountInCurrentRow % 2 != 0) return (seatsCountInCurrentRow / 2) + 1;
         
-        var medianSeatNumber = seatsInCurrentRow / 2;
+        var medianSeatNumber = seatsCountInCurrentRow / 2;
         return numberOfTickets % 2 == 0 ? medianSeatNumber : medianSeatNumber + 1;
     }
 
@@ -104,12 +104,12 @@ public static class CinemaUtility
         const string startSeatPositionPattern = @"^[A-Za-z]\d+$";
         if (!Regex.IsMatch(newSeatPosition, startSeatPositionPattern)) return false;
 
-        var newSeatPositionRowLabel = GetNewSeatPositionRowLabel(newSeatPosition);
+        var newSeatPositionRowLabel = GetSeatPositionRowLabel(newSeatPosition);
 
         var allLabels = rowLayouts.Select(r => r.RowLabel).ToList();
         if (!allLabels.Contains(newSeatPositionRowLabel)) return false;
 
-        var newSeatPositionNumber = GetNewSeatPositionNumber(newSeatPosition);
+        var newSeatPositionNumber = GetSeatPositionNumber(newSeatPosition);
         var allSeatNumbersInRow = rowLayouts.First().Seats.Select(s => s.SeatNumber).ToList();
         if (!allSeatNumbersInRow.Contains(newSeatPositionNumber)) return false;
         return true;
