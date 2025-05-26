@@ -3,7 +3,7 @@
 namespace UnitTests.Service;
 
 [TestClass]
-public class CinemaServiceTest
+public class CinemaAccessorTest
 {
     [TestMethod]
     [DataRow("", false)]
