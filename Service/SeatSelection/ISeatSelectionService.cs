@@ -2,7 +2,7 @@
 
 public interface ISeatSelectionService
 {
-    string ReserveSeats(int numberOfTicketsBook, string? newSeatPosition = null);
+    string ReserveSeats(int numberOfTicketsToBook, string? newSeatPosition = null);
     void ConfirmSeats(string bookingId);
     void FreeSeats(string newBookingId);
 }

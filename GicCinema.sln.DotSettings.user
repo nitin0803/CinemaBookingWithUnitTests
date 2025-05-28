@@ -1,0 +1,17 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=40c302b7_002De006_002D4fd3_002D83aa_002D031af1826185/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CinemaUtilityTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Domain.Utility.CinemaUtilityTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Domain.Validator.CinemaValidatorTest.AreCinemaDetailsValid_GivenCinemaDetails_ReturnsCorrectResult&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Domain.Validator.CinemaValidatorTest.IsNewSeatPositionValid_GivenRowLayouts_ReturnsCorrectResult&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Domain.Validator.CinemaValidatorTest.IsNumberOfTicketsToBookValid_GivenNumberOfTicketsToBookInput_ReturnsCorrectResult&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Domain.Accessor.CinemaAccessorTest.CreateCinema_GivenMovieNameNumberOfRowsAndSeatsPerRow_CreateCinema&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Domain.Accessor.CinemaAccessorTest.GetCinema_ReturnsSameCreatedInstance&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Domain.Accessor.CinemaAccessorTest.GetCinema_EveryTimeReturnsSameCreatedInstance&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Domain.Accessor.CinemaAccessorTest.AddBooking_GivenNewBookingIdWithSameIdAsExitingBooking_ThrowsException&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Service.MenuItemSelection.BookTicketsServiceTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Service.MenuItemSelection.CheckBookingsServiceTest.IsResponsible_GivenMenuItemOption_ReturnsCorrectResult&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.Service.MenuItemSelection.ExitServiceTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::8FFFC530-EA77-42B1-807F-B78C7A16ADC2::net8.0::UnitTests.App.CinemaControllerTest.StartCinemaApplication_CallsCreateCinemaAndHandleParticularMenuItemSelection&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

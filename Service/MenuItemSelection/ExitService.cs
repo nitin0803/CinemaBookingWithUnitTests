@@ -5,12 +5,11 @@ namespace Service.MenuItemSelection;
 
 public class ExitService : IMenuItemSelectionService
 {
+    public bool IsResponsible(MenuItemOption menuItemOption) => menuItemOption == MenuItemOption.Exit;
+
     public void Handle(MenuItemOption menuItemOption)
     {
-        if (!IsResponsible(menuItemOption)) return;
         Console.WriteLine((string?)CinemaUtility.AppMessage.ThankYou);
         Console.WriteLine();
     }
-
-    private static bool IsResponsible(MenuItemOption menuItemOption) => menuItemOption == MenuItemOption.Exit;
 }

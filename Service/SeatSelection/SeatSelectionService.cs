@@ -2,40 +2,38 @@
 using Domain.Enums;
 using Domain.Models;
 using Domain.Utility;
+using Domain.Validator;
 
 namespace Service.SeatSelection;
 
 public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
     : ISeatSelectionService
 {
-    public string ReserveSeats(int numberOfTicketsBook, string? newSeatPosition)
+    public string ReserveSeats(int numberOfTicketsToBook, string? newSeatPosition)
     {
         var cinema = cinemaAccessor.GetCinema();
-        var hallLayOut = cinema.HallLayout;
+        var hallRowLayOuts = cinema.HallLayOut.RowLayOuts;
 
         var newBookingId = CinemaUtility.GetNewBookingId(cinema.Bookings);
-
+        var rowLayOutsSequence = GetRowLayOutsSequence(hallRowLayOuts, newSeatPosition);
         var filledSeatsCounter = 0;
-        var rowLayoutsSequence = string.IsNullOrWhiteSpace(newSeatPosition)
-            ? hallLayOut.RowLayOuts.Reverse()
-            : GetRowLayOutsSequence(hallLayOut.RowLayOuts, newSeatPosition);
 
-        foreach (var rowLayOut in rowLayoutsSequence)
+        foreach (var rowLayOut in rowLayOutsSequence)
         {
-            if (filledSeatsCounter == numberOfTicketsBook) break;
+            if (filledSeatsCounter == numberOfTicketsToBook) break;
 
             filledSeatsCounter = !string.IsNullOrWhiteSpace(newSeatPosition)
                                  && IsNewSeatPositionBelongsToCurrentRow(rowLayOut)
                 ? ReserveSeatsFromNewSeatPosition(
+                    rowLayOut,
                     newBookingId,
-                    numberOfTicketsBook,
-                    rowLayOut.Seats,
+                    numberOfTicketsToBook,
                     filledSeatsCounter,
                     newSeatPosition)
                 : ReserveSeatsFromMiddle(
+                    rowLayOut,
                     newBookingId,
-                    numberOfTicketsBook,
-                    rowLayOut.Seats,
+                    numberOfTicketsToBook,
                     filledSeatsCounter);
         }
 
@@ -51,7 +49,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
     public void ConfirmSeats(string newBookingId)
     {
         var cinema = cinemaAccessor.GetCinema();
-        var hallLayOut = cinema.HallLayout;
+        var hallLayOut = cinema.HallLayOut;
 
         var reserveSeats = hallLayOut.RowLayOuts
             .SelectMany(r => r.Seats)
@@ -73,7 +71,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
     public void FreeSeats(string newBookingId)
     {
         var cinema = cinemaAccessor.GetCinema();
-        var hallLayOut = cinema.HallLayout;
+        var hallLayOut = cinema.HallLayOut;
 
         var reserveSeats = hallLayOut.RowLayOuts
             .SelectMany(r => r.Seats)
@@ -88,9 +86,18 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
 
     private static IReadOnlyList<RowLayOut> GetRowLayOutsSequence(
         IReadOnlyList<RowLayOut> rowLayouts,
-        string startSeatPosition)
+        string? newSeatPosition)
     {
-        var newSeatPositionRowLabel = CinemaUtility.GetSeatPositionRowLabel(startSeatPosition);
+        if (string.IsNullOrWhiteSpace(newSeatPosition)) return rowLayouts.Reverse().ToList();
+
+        if (!CinemaValidator.IsNewSeatPositionValid(rowLayouts, newSeatPosition))
+        {
+            var exceptionMessage =
+                string.Format($"{CinemaUtility.ExceptionMessage.SeatingPositionValueNotCorrect}",newSeatPosition);
+            throw new Exception(exceptionMessage);
+        }
+
+        var newSeatPositionRowLabel = CinemaUtility.GetSeatPositionRowLabel(newSeatPosition);
         var firstSequence = new List<RowLayOut>();
         var secondSequence = new List<RowLayOut>();
         foreach (var rowLayOut in rowLayouts.Reverse())
@@ -110,22 +117,24 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
     }
 
     private int ReserveSeatsFromMiddle(
+        RowLayOut rowLayOut,
         string newBookingId,
         int numberOfTicketsBook,
-        IReadOnlyList<Seat> seatsInCurrentRow,
         int totalFilledSeats)
     {
-        var seatsToFillCount = seatsInCurrentRow.Count(s => s.Status == SeatStatus.Empty);
-        
+        var seatsInCurrentRow = rowLayOut.Seats;
         var seatsCountInCurrentRow = seatsInCurrentRow.Count;
+        var seatsCountToFillInCurrentRow = seatsInCurrentRow.Count(s => s.Status == SeatStatus.Empty);
+
         var middleSeatNumber = CinemaUtility.GetMiddleSeatNumber(seatsCountInCurrentRow, numberOfTicketsBook);
-        
+
         var firstSeatToReserve = GetSeatToReserve(seatsInCurrentRow, middleSeatNumber)
                                  ?? GetSeatToReserve(seatsInCurrentRow, middleSeatNumber, DirectionSide.Left);
 
         if (firstSeatToReserve == null) return totalFilledSeats;
 
         var numberOfSeatsFilledInCurrentRow = 0;
+
         ReserveSeat(
             firstSeatToReserve,
             newBookingId,
@@ -133,7 +142,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
             ref numberOfSeatsFilledInCurrentRow);
 
         if (totalFilledSeats == numberOfTicketsBook
-            || numberOfSeatsFilledInCurrentRow == seatsToFillCount)
+            || numberOfSeatsFilledInCurrentRow == seatsCountToFillInCurrentRow)
             return totalFilledSeats;
 
         var rightSeatToReserve = firstSeatToReserve;
@@ -154,7 +163,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
                     ref numberOfSeatsFilledInCurrentRow);
 
                 if (totalFilledSeats == numberOfTicketsBook
-                    || numberOfSeatsFilledInCurrentRow == seatsToFillCount)
+                    || numberOfSeatsFilledInCurrentRow == seatsCountToFillInCurrentRow)
                     break;
             }
 
@@ -170,7 +179,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
                 ref numberOfSeatsFilledInCurrentRow);
 
             if (totalFilledSeats == numberOfTicketsBook
-                || numberOfSeatsFilledInCurrentRow == seatsToFillCount)
+                || numberOfSeatsFilledInCurrentRow == seatsCountToFillInCurrentRow)
                 break;
         }
 
@@ -178,19 +187,19 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
     }
 
     private int ReserveSeatsFromNewSeatPosition(
+        RowLayOut rowLayOut,
         string newBookingId,
-        int numberOfTickets,
-        IReadOnlyList<Seat> seatsInCurrentRow,
+        int numberOfTicketsToBook,
         int totalFilledSeats,
         string newSeatPosition)
     {
+        var seatsInCurrentRow = rowLayOut.Seats;
         var newSeatPositionNumber = CinemaUtility.GetSeatPositionNumber(newSeatPosition);
-
         var seatsFromNewSeatPosition = seatsInCurrentRow
             .Where(s => s.SeatNumber >= newSeatPositionNumber)
             .ToList();
 
-        var seatsCountToFill = seatsFromNewSeatPosition
+        var seatsCountToFillInCurrentRow = seatsFromNewSeatPosition
             .Count(s => s.Status == SeatStatus.Empty);
 
         var numberOfSeatsFilledInCurrentRow = 0;
@@ -199,12 +208,13 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
 
         if (firstSeatToReserve == null) return totalFilledSeats;
 
-        ReserveSeat(firstSeatToReserve, 
-            newBookingId, 
-            ref totalFilledSeats, 
+        ReserveSeat(firstSeatToReserve,
+            newBookingId,
+            ref totalFilledSeats,
             ref numberOfSeatsFilledInCurrentRow);
 
-        if (totalFilledSeats == numberOfTickets || numberOfSeatsFilledInCurrentRow == seatsCountToFill)
+        if (totalFilledSeats == numberOfTicketsToBook ||
+            numberOfSeatsFilledInCurrentRow == seatsCountToFillInCurrentRow)
             return totalFilledSeats;
 
         var nextRightSeatToReserve = firstSeatToReserve;
@@ -216,12 +226,13 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
             if (nextRightSeatToReserve == null) break;
 
             ReserveSeat(
-                nextRightSeatToReserve, 
-                newBookingId, 
+                nextRightSeatToReserve,
+                newBookingId,
                 ref totalFilledSeats,
                 ref numberOfSeatsFilledInCurrentRow);
 
-            if (totalFilledSeats == numberOfTickets || numberOfSeatsFilledInCurrentRow == seatsCountToFill) break;
+            if (totalFilledSeats == numberOfTicketsToBook ||
+                numberOfSeatsFilledInCurrentRow == seatsCountToFillInCurrentRow) break;
         }
 
         return totalFilledSeats;

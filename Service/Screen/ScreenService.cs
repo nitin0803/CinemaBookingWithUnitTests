@@ -23,7 +23,7 @@ public class ScreenService(ICinemaAccessor cinemaAccessor) : IScreenService
             separator.Append('-');
         }
         Console.WriteLine(separator);
-        var hallLayout = cinema.HallLayout;
+        var hallLayout = cinema.HallLayOut;
         var rowLayOuts = hallLayout.RowLayOuts;
         foreach (var rowLayOut in rowLayOuts)
         {

@@ -4,7 +4,6 @@ public class Cinema
 {
     private static readonly object LockObject = new();
     private static Cinema? _instance;
-
     private List<Booking> _bookings;
 
     private Cinema(string movie, int totalRows, int seatsPerRow)
@@ -13,22 +12,21 @@ public class Cinema
         TotalRows = totalRows;
         SeatsPerRow = seatsPerRow;
         _bookings = new List<Booking>();
-        HallLayout = CreateHallLayout();
+        HallLayOut = CreateHallLayout();
     }
 
     public string Movie { get; }
-    private int TotalRows { get; }
+    public int TotalRows { get; }
     public int SeatsPerRow { get; }
-    public HallLayout HallLayout { get; }
+    public HallLayout HallLayOut { get; }
 
     public IReadOnlyList<Booking> Bookings => _bookings;
-
-    public int AvailableSeats => TotalHallSeats - TotalBookedSeats;
     
-    private int TotalHallSeats => TotalRows * SeatsPerRow;
-    private int TotalBookedSeats => Bookings.Aggregate(0, (total, booking) => total + booking.NumberOfBookedSeats);
+    public int TotalHallSeats => TotalRows * SeatsPerRow;
+    public int TotalBookedSeats => Bookings.Aggregate(0, (total, booking) => total + booking.NumberOfBookedSeats);
+    public int AvailableSeats => TotalHallSeats - TotalBookedSeats;
 
-    public static Cinema Create(string movie, int rows, int seatsPerRow)
+    internal static Cinema Create(string movie, int rows, int seatsPerRow)
     {
         lock (LockObject)
         {
@@ -38,7 +36,7 @@ public class Cinema
         }
     }
 
-    public static Cinema GetCinema()
+    internal static Cinema GetCinema()
     {
         if (_instance != null) return _instance;
         Console.WriteLine("Exception occurred as no Cinema available!");

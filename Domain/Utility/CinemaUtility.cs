@@ -1,29 +1,13 @@
-﻿using System.Text.RegularExpressions;
-using Domain.Models;
+﻿using Domain.Models;
 
 namespace Domain.Utility;
 
 public static class CinemaUtility
 {
-    public static char GetSeatPositionRowLabel(string newSeatPosition) => newSeatPosition.Substring(0, 1)[0];
-    
-    public static int GetSeatPositionNumber(string newSeatPosition) => Convert.ToInt32(newSeatPosition.Substring(1));
-
-    public static string GetNewBookingId(IReadOnlyList<Booking> currentBookings)
+    public struct RegexPattern
     {
-        var lastBookingNumber = currentBookings.Count == 0
-            ? 0
-            : Convert.ToInt32((string?)currentBookings.Last().BookingId.Substring(3));
-        
-        return "GIC" + (lastBookingNumber + 1).ToString("D4");
-    }
-
-    public static int GetMiddleSeatNumber(int seatsCountInCurrentRow, int numberOfTickets)
-    {
-        if (seatsCountInCurrentRow % 2 != 0) return (seatsCountInCurrentRow / 2) + 1;
-        
-        var medianSeatNumber = seatsCountInCurrentRow / 2;
-        return numberOfTickets % 2 == 0 ? medianSeatNumber : medianSeatNumber + 1;
+        public const string BookingId = @"^GIC\d{4}$";
+        public const string SeatPosition = @"^[A-Za-z]\d+$";
     }
 
     public struct AppMessage
@@ -33,7 +17,7 @@ public static class CinemaUtility
 
         public const string Welcome = "Welcome to GIC Cinemas";
         public const string EnterSelection = "Please enter your selection:";
-        
+
         public const string Blank = "or enter blank to go back to main menu:";
         public const string NumberOfTickets = "Enter number of tickets to book, ";
         public const string BookingId = "Enter booking id, ";
@@ -47,7 +31,7 @@ public static class CinemaUtility
         public const string SeatsAvailabilityAlert = "Sorry, there are only {0} seats available.";
         public const string NoBookingFound = "Sorry, no booking Found for entered booking id: {0}";
     }
-    
+
     public struct MenuItem
     {
         public const string BookTickets = "[1] Book tickets for {0} ({1} seats available)";
@@ -71,96 +55,35 @@ public static class CinemaUtility
 
     public struct ExceptionMessage
     {
-        public const string DuplicateBookingsFound =
-            "Exception occurred as duplicate booking entries found for booking id {0} !";
+        public const string SeatingPositionValueNotCorrect =
+            "Seating position value {0} is not correct!";
+
+        public const string BookingAlreadyExist =
+            "Exception occurred as booking already exist for booking id: {0} !";
     }
 
-    public static bool AreCinemaDetailsValid(string? cinemaDetails)
+    public static char GetSeatPositionRowLabel(string seatPosition)
     {
-        if (string.IsNullOrWhiteSpace(cinemaDetails)) return false;
-
-        var cinemaValues = cinemaDetails.Split(" ");
-        if (cinemaValues.Length != 3)
-        {
-            Console.WriteLine(ValidationMessage.InvalidMovieDetails);
-            return false;
-        }
-
-        if (cinemaValues[0].Length > 50)
-        {
-            Console.WriteLine(ValidationMessage.MovieNameExceed);
-            return false;
-        }
-
-        if (!AreRowsValid(cinemaValues)) return false;
-
-        if (!AreSeatsPerRowValid(cinemaValues)) return false;
-
-        return true;
+        return seatPosition.Substring(0, 1)[0];
     }
 
-    public static bool IsNewSeatPositionValid(IReadOnlyList<RowLayOut> rowLayouts, string newSeatPosition)
+    public static int GetSeatPositionNumber(string newSeatPosition) => Convert.ToInt32(newSeatPosition.Substring(1));
+
+    public static string GetNewBookingId(IReadOnlyList<Booking> currentBookings)
     {
-        const string startSeatPositionPattern = @"^[A-Za-z]\d+$";
-        if (!Regex.IsMatch(newSeatPosition, startSeatPositionPattern)) return false;
+        var lastBookingNumber = currentBookings.Count == 0
+            ? 0
+            : Convert.ToInt32((string?)currentBookings.Last().BookingId.Substring(3));
 
-        var newSeatPositionRowLabel = GetSeatPositionRowLabel(newSeatPosition);
-
-        var allLabels = rowLayouts.Select(r => r.RowLabel).ToList();
-        if (!allLabels.Contains(newSeatPositionRowLabel)) return false;
-
-        var newSeatPositionNumber = GetSeatPositionNumber(newSeatPosition);
-        var allSeatNumbersInRow = rowLayouts.First().Seats.Select(s => s.SeatNumber).ToList();
-        if (!allSeatNumbersInRow.Contains(newSeatPositionNumber)) return false;
-        return true;
+        return "GIC" + (lastBookingNumber + 1).ToString("D4");
     }
 
-    public static bool IsNumberOfTicketsValid(string numberOfTicketsInput)
+    public static int GetMiddleSeatNumber(int seatsCountInCurrentRow, int numberOfTicketsBook)
     {
-        if (!int.TryParse(numberOfTicketsInput, out int numberOfTickets))
-        {
-            return false;
-        }
+        if (seatsCountInCurrentRow % 2 != 0) return seatsCountInCurrentRow / 2 + 1;
 
-        if (numberOfTickets < 1)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private static bool AreSeatsPerRowValid(string[] inputArray)
-    {
-        if (!int.TryParse(inputArray[2], out int seatsPerRow))
-        {
-            Console.WriteLine(ValidationMessage.InvalidSeatsPerRow);
-            return false;
-        }
-
-        if (seatsPerRow is < 1 or > 50)
-        {
-            Console.WriteLine(ValidationMessage.SeatsPerRowRangeExceed);
-            return false;
-        }
-
-        return true;
-    }
-
-    private static bool AreRowsValid(string[] inputArray)
-    {
-        if (!int.TryParse(inputArray[1], out int rows))
-        {
-            Console.WriteLine(ValidationMessage.InvalidRow);
-            return false;
-        }
-
-        if (rows is < 1 or > 26)
-        {
-            Console.WriteLine(ValidationMessage.RowRangeExceed);
-            return false;
-        }
-
-        return true;
+        var medianSeatNumber = seatsCountInCurrentRow / 2;
+        
+        return numberOfTicketsBook % 2 == 0 ? medianSeatNumber : medianSeatNumber + 1;
     }
 }

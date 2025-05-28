@@ -17,19 +17,21 @@ public class CinemaAccessor : ICinemaAccessor
 
     public void AddBooking(Booking booking)
     {
-        GetCinema().AddBooking(booking);
+        var cinema = GetCinema();
+
+        var isBookingAlreadyExist = cinema.Bookings.Any(b => b.BookingId.Equals(booking.BookingId));
+
+        if (isBookingAlreadyExist)
+        {
+            var exceptionMessage = string.Format($"{CinemaUtility.ExceptionMessage.BookingAlreadyExist}", booking.BookingId);
+            throw new Exception(exceptionMessage);
+        }
+
+        cinema.AddBooking(booking);
     }
 
     public Booking? TryGetBooking(string bookingId)
     {
-        try
-        {
-            return GetCinema().Bookings.SingleOrDefault(b => b.BookingId == bookingId); 
-        }
-        catch (Exception)
-        {
-            Console.WriteLine(CinemaUtility.ExceptionMessage.DuplicateBookingsFound, bookingId);
-            throw;
-        }
+        return GetCinema().Bookings.SingleOrDefault(b => b.BookingId == bookingId);
     }
 }
