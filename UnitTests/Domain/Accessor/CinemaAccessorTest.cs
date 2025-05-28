@@ -1,5 +1,7 @@
 ﻿using Domain.Accessor;
 using Domain.Models;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Shouldly;
 
 namespace UnitTests.Domain.Accessor;
@@ -7,7 +9,13 @@ namespace UnitTests.Domain.Accessor;
 [TestClass]
 public class CinemaAccessorTest
 {
-    private readonly ICinemaAccessor _sut = new CinemaAccessor();
+    private readonly Mock<ILogger<CinemaAccessor>> loggerMock =new();
+    private readonly ICinemaAccessor _sut;
+
+    public CinemaAccessorTest()
+    {
+        _sut = new CinemaAccessor(loggerMock.Object);
+    }
 
     [TestMethod]
     public void CreateCinema_GivenMovieNameNumberOfRowsAndSeatsPerRow_CreateCinema()

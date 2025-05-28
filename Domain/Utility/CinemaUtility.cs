@@ -55,6 +55,9 @@ public static class CinemaUtility
 
     public struct ExceptionMessage
     {
+        public const string NoCinemaFound =
+            "No Cinema found!";
+        
         public const string SeatingPositionValueNotCorrect =
             "Seating position value {0} is not correct!";
 

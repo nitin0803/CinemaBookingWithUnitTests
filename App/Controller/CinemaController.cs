@@ -3,6 +3,8 @@ using Domain.CinemaConsole;
 using Domain.Enums;
 using Domain.Utility;
 using Domain.Validator;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Service.MenuItemSelection;
 
 namespace App.Controller;
@@ -10,7 +12,8 @@ namespace App.Controller;
 public class CinemaController(
     ICinemaConsole cinemaConsole,
     ICinemaAccessor cinemaAccessor,
-    IEnumerable<IMenuItemSelectionService> menuItemSelectionServices)
+    IEnumerable<IMenuItemSelectionService> menuItemSelectionServices,
+    ILogger<CinemaAccessor> logger)
     : ICinemaController
 {
     public void StartCinemaApplication()
@@ -31,6 +34,7 @@ public class CinemaController(
         var seatsPerRow = int.Parse(inputArray[2]);
 
         var cinema = cinemaAccessor.CreateCinema(inputArray[0], rows, seatsPerRow);
+        logger.Log(LogLevel.Information, $"Cinema created as Movie name: {cinema.Movie}, rows: {cinema.TotalRows}, seatsPerRow: {cinema.SeatsPerRow}");
 
         var menuItemOption = MenuItemOption.None;
         while (menuItemOption != MenuItemOption.Exit)

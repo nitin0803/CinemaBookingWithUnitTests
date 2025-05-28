@@ -3,6 +3,7 @@ using Domain.Accessor;
 using Domain.CinemaConsole;
 using Domain.Enums;
 using Domain.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Service.MenuItemSelection;
 
@@ -16,6 +17,7 @@ public class CinemaControllerTest
     private readonly Mock<IMenuItemSelectionService> bookTicketsServiceMock = new();
     private readonly Mock<IMenuItemSelectionService> checkBookingsServiceMock = new();
     private readonly Mock<IMenuItemSelectionService> exitServiceMock = new();
+    private readonly Mock<ILogger<CinemaAccessor>> loggerMock = new();
 
     private readonly CinemaController sut;
 
@@ -28,7 +30,11 @@ public class CinemaControllerTest
             exitServiceMock.Object
         };
 
-        sut = new CinemaController(cinemaConsoleMock.Object, cinemaAccessorMock.Object, menuItemSelectionServices);
+        sut = new CinemaController(
+            cinemaConsoleMock.Object,
+            cinemaAccessorMock.Object,
+            menuItemSelectionServices,
+            loggerMock.Object);
     }
 
     [TestMethod]
@@ -44,15 +50,15 @@ public class CinemaControllerTest
             .Returns(cinema);
         exitServiceMock.Setup(m => m.IsResponsible(It.IsAny<MenuItemOption>()))
             .Returns(true);
-        
+
         // Act
         sut.StartCinemaApplication();
-        
+
         // Assert
         bookTicketsServiceMock.Verify(m => m.IsResponsible(It.IsAny<MenuItemOption>()), Times.Once());
         checkBookingsServiceMock.Verify(m => m.IsResponsible(It.IsAny<MenuItemOption>()), Times.Once());
         exitServiceMock.Verify(m => m.IsResponsible(It.IsAny<MenuItemOption>()), Times.Once());
-        
+
         checkBookingsServiceMock.Verify(m => m.Handle(It.IsAny<MenuItemOption>()), Times.Never);
         bookTicketsServiceMock.Verify(m => m.Handle(It.IsAny<MenuItemOption>()), Times.Never);
         exitServiceMock.Verify(m => m.Handle(It.IsAny<MenuItemOption>()), Times.Once);

@@ -1,4 +1,6 @@
-﻿namespace Domain.Models;
+﻿using Domain.Utility;
+
+namespace Domain.Models;
 
 public class Cinema
 {
@@ -39,8 +41,7 @@ public class Cinema
     internal static Cinema GetCinema()
     {
         if (_instance != null) return _instance;
-        Console.WriteLine("Exception occurred as no Cinema available!");
-        throw new Exception("No Cinema Found");
+        throw new Exception(CinemaUtility.ExceptionMessage.NoCinemaFound);
     }
 
     internal void AddBooking(Booking booking)

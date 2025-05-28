@@ -1,9 +1,10 @@
 ﻿using Domain.Models;
 using Domain.Utility;
+using Microsoft.Extensions.Logging;
 
 namespace Domain.Accessor;
 
-public class CinemaAccessor : ICinemaAccessor
+public class CinemaAccessor(ILogger<CinemaAccessor> logger) : ICinemaAccessor
 {
     public Cinema CreateCinema(string movie, int rows, int seatsPerRow)
     {
@@ -12,7 +13,17 @@ public class CinemaAccessor : ICinemaAccessor
 
     public Cinema GetCinema()
     {
-        return Cinema.GetCinema();
+        try
+        {
+            return Cinema.GetCinema();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Exception occurred as no Cinema available!");
+            var exceptionMessage = $"Exception occurred: {e.Message}";
+            logger.Log(LogLevel.Critical, exceptionMessage);
+            throw;
+        }
     }
 
     public void AddBooking(Booking booking)
@@ -23,7 +34,9 @@ public class CinemaAccessor : ICinemaAccessor
 
         if (isBookingAlreadyExist)
         {
-            var exceptionMessage = string.Format($"{CinemaUtility.ExceptionMessage.BookingAlreadyExist}", booking.BookingId);
+            var exceptionMessage =
+                string.Format($"{CinemaUtility.ExceptionMessage.BookingAlreadyExist}", booking.BookingId);
+            logger.Log(LogLevel.Critical, exceptionMessage);
             throw new Exception(exceptionMessage);
         }
 

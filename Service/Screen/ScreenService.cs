@@ -2,26 +2,29 @@
 using Domain.Accessor;
 using Domain.Models;
 using Domain.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace Service.Screen;
 
-public class ScreenService(ICinemaAccessor cinemaAccessor) : IScreenService
+public class ScreenService(
+    ICinemaAccessor cinemaAccessor) : IScreenService
 {
     public void Show(string currentBookingId)
     {
         var cinema = cinemaAccessor.GetCinema();
         var seatsPerRow = cinema.SeatsPerRow;
-        
+
         Console.WriteLine($"Booking id: {currentBookingId}");
         Console.WriteLine("Selected seats: ");
         Console.WriteLine();
-        
+
         Console.WriteLine("         S C R E E N                  ");
         var separator = new StringBuilder();
-        for (var i =0; i <= seatsPerRow*3 + 2; i++)
+        for (var i = 0; i <= seatsPerRow * 3 + 2; i++)
         {
             separator.Append('-');
         }
+
         Console.WriteLine(separator);
         var hallLayout = cinema.HallLayOut;
         var rowLayOuts = hallLayout.RowLayOuts;
@@ -33,14 +36,17 @@ public class ScreenService(ICinemaAccessor cinemaAccessor) : IScreenService
                 var seatSymbol = GetSeatSymbol(seat, currentBookingId);
                 Console.Write(seatSymbol);
             }
+
             Console.WriteLine();
         }
+
         var seatNumber = new StringBuilder();
         var anyRowLayout = rowLayOuts.First();
         foreach (var seat in anyRowLayout.Seats)
         {
             seatNumber.Append(seat.SeatNumber + "  ");
         }
+
         Console.Write("   " + seatNumber);
         Console.WriteLine();
     }

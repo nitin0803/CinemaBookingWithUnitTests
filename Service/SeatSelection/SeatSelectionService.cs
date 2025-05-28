@@ -3,10 +3,11 @@ using Domain.Enums;
 using Domain.Models;
 using Domain.Utility;
 using Domain.Validator;
+using Microsoft.Extensions.Logging;
 
 namespace Service.SeatSelection;
 
-public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
+public class SeatSelectionService(ICinemaAccessor cinemaAccessor, ILogger<SeatSelectionService> logger)
     : ISeatSelectionService
 {
     public string ReserveSeats(int numberOfTicketsToBook, string? newSeatPosition)
@@ -84,7 +85,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
         }
     }
 
-    private static IReadOnlyList<RowLayOut> GetRowLayOutsSequence(
+    private IReadOnlyList<RowLayOut> GetRowLayOutsSequence(
         IReadOnlyList<RowLayOut> rowLayouts,
         string? newSeatPosition)
     {
@@ -94,6 +95,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor)
         {
             var exceptionMessage =
                 string.Format($"{CinemaUtility.ExceptionMessage.SeatingPositionValueNotCorrect}",newSeatPosition);
+            logger.Log(LogLevel.Critical, exceptionMessage);
             throw new Exception(exceptionMessage);
         }
 
