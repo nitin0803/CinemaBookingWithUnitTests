@@ -4,6 +4,7 @@ using Domain.Models;
 using Domain.Utility;
 using Domain.Validator;
 using Microsoft.Extensions.Logging;
+using static System.String;
 
 namespace Service.SeatSelection;
 
@@ -12,10 +13,12 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor, ILogger<SeatSe
 {
     public string ReserveSeats(int numberOfTicketsToBook, string? newSeatPosition)
     {
+        logger.LogInformation($"number of tickets to book: {numberOfTicketsToBook}");
         var cinema = cinemaAccessor.GetCinema();
         var hallRowLayOuts = cinema.HallLayOut.RowLayOuts;
 
         var newBookingId = CinemaUtility.GetNewBookingId(cinema.Bookings);
+        logger.LogInformation($"new booking id generated: {newBookingId}");
         var rowLayOutsSequence = GetRowLayOutsSequence(hallRowLayOuts, newSeatPosition);
         var filledSeatsCounter = 0;
 
@@ -23,7 +26,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor, ILogger<SeatSe
         {
             if (filledSeatsCounter == numberOfTicketsToBook) break;
 
-            filledSeatsCounter = !string.IsNullOrWhiteSpace(newSeatPosition)
+            filledSeatsCounter = !IsNullOrWhiteSpace(newSeatPosition)
                                  && IsNewSeatPositionBelongsToCurrentRow(rowLayOut)
                 ? ReserveSeatsFromNewSeatPosition(
                     rowLayOut,
@@ -42,7 +45,9 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor, ILogger<SeatSe
 
         bool IsNewSeatPositionBelongsToCurrentRow(RowLayOut currentRow)
         {
+            logger.LogInformation($"Seat position from seats to be book: {newSeatPosition}");
             var newSeatPositionRowLabel = CinemaUtility.GetSeatPositionRowLabel(newSeatPosition);
+            logger.LogInformation($"Current row to fill: {currentRow.RowLabel} seats in row: {currentRow.Seats.Count}");
             return currentRow.RowLabel.Equals(newSeatPositionRowLabel);
         }
     }
@@ -89,13 +94,13 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor, ILogger<SeatSe
         IReadOnlyList<RowLayOut> rowLayouts,
         string? newSeatPosition)
     {
-        if (string.IsNullOrWhiteSpace(newSeatPosition)) return rowLayouts.Reverse().ToList();
+        if (IsNullOrWhiteSpace(newSeatPosition)) return rowLayouts.Reverse().ToList();
 
         if (!CinemaValidator.IsNewSeatPositionValid(rowLayouts, newSeatPosition))
         {
             var exceptionMessage =
-                string.Format($"{CinemaUtility.ExceptionMessage.SeatingPositionValueNotCorrect}",newSeatPosition);
-            logger.Log(LogLevel.Critical, exceptionMessage);
+                Format($"{CinemaUtility.ExceptionMessage.SeatingPositionValueNotCorrect}", newSeatPosition);
+            logger.LogCritical(exceptionMessage);
             throw new Exception(exceptionMessage);
         }
 
@@ -120,7 +125,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor, ILogger<SeatSe
 
     private int ReserveSeatsFromMiddle(
         RowLayOut rowLayOut,
-        string newBookingId,
+        string? newBookingId,
         int numberOfTicketsBook,
         int totalFilledSeats)
     {
@@ -137,6 +142,7 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor, ILogger<SeatSe
 
         var numberOfSeatsFilledInCurrentRow = 0;
 
+        logger.LogInformation($"{nameof(ReserveSeatsFromMiddle)}: Reserving seats in row: {rowLayOut.RowLabel}");
         ReserveSeat(
             firstSeatToReserve,
             newBookingId,
@@ -190,11 +196,12 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor, ILogger<SeatSe
 
     private int ReserveSeatsFromNewSeatPosition(
         RowLayOut rowLayOut,
-        string newBookingId,
+        string? newBookingId,
         int numberOfTicketsToBook,
         int totalFilledSeats,
         string newSeatPosition)
     {
+        logger.LogInformation($"{nameof(ReserveSeatsFromNewSeatPosition)}: Reserving seats in row: {rowLayOut.RowLabel}");
         var seatsInCurrentRow = rowLayOut.Seats;
         var newSeatPositionNumber = CinemaUtility.GetSeatPositionNumber(newSeatPosition);
         var seatsFromNewSeatPosition = seatsInCurrentRow
@@ -266,13 +273,16 @@ public class SeatSelectionService(ICinemaAccessor cinemaAccessor, ILogger<SeatSe
 
     private void ReserveSeat(
         Seat seatToReserve,
-        string newBookingId,
+        string? newBookingId,
         ref int totalFilledSeats,
         ref int numberOfSeatsFilledInCurrentRow)
     {
         seatToReserve.Update(SeatStatus.Reserved, newBookingId);
         totalFilledSeats++;
         numberOfSeatsFilledInCurrentRow++;
+        logger.LogInformation($"Reserved seat number: {seatToReserve.SeatNumber}");
+        logger.LogInformation($"Total filled seats till now: {totalFilledSeats}");
+        logger.LogInformation($"Number of seats filled in current row: {numberOfSeatsFilledInCurrentRow}");
     }
 
     private bool HasRowLimitReached(

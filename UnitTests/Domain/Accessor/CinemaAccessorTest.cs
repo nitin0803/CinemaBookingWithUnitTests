@@ -10,18 +10,18 @@ namespace UnitTests.Domain.Accessor;
 public class CinemaAccessorTest
 {
     private readonly Mock<ILogger<CinemaAccessor>> loggerMock =new();
-    private readonly ICinemaAccessor _sut;
+    private readonly ICinemaAccessor sut;
 
     public CinemaAccessorTest()
     {
-        _sut = new CinemaAccessor(loggerMock.Object);
+        sut = new CinemaAccessor(loggerMock.Object);
     }
 
     [TestMethod]
     public void CreateCinema_GivenMovieNameNumberOfRowsAndSeatsPerRow_CreateCinema()
     {
         // Arrange & Act
-        var createdCinema = _sut.CreateCinema("TestMovieName", 2, 3);
+        var createdCinema = sut.CreateCinema("TestMovieName", 2, 3);
 
         // Assert
         createdCinema.Movie.ShouldBe("TestMovieName");
@@ -53,10 +53,10 @@ public class CinemaAccessorTest
     public void GetCinema_ReturnsSameCreatedInstance()
     {
         // Arrange
-        var createdCinema = _sut.CreateCinema("TestMovieName", 2, 3);
+        var createdCinema = sut.CreateCinema("TestMovieName", 2, 3);
 
         // Act
-        var result = _sut.GetCinema();
+        var result = sut.GetCinema();
 
         // Assert
         result.ShouldBeSameAs(createdCinema);
@@ -66,12 +66,12 @@ public class CinemaAccessorTest
     public void GetCinema_EveryTimeReturnsSameCreatedInstance()
     {
         // Arrange
-        var createdCinema = _sut.CreateCinema("TestMovieName", 2, 3);
+        var createdCinema = sut.CreateCinema("TestMovieName", 2, 3);
 
         // Act
-        var result1 = _sut.GetCinema();
-        var result2 = _sut.GetCinema();
-        var result3 = _sut.GetCinema();
+        var result1 = sut.GetCinema();
+        var result2 = sut.GetCinema();
+        var result3 = sut.GetCinema();
 
         // Assert
         result1.ShouldBeSameAs(createdCinema);
@@ -83,10 +83,10 @@ public class CinemaAccessorTest
     public void AddBooking_AddNewBookingIntoCinema()
     {
         // Arrange
-        var createdCinema = _sut.CreateCinema("TestMovieName", 2, 3);
+        var createdCinema = sut.CreateCinema("TestMovieName", 2, 3);
 
         // Act
-        _sut.AddBooking(new Booking("GIC1234", 4));
+        sut.AddBooking(new Booking("GIC1234", 4));
 
         // Assert
         createdCinema.Bookings.Count.ShouldBe(1);
@@ -99,13 +99,13 @@ public class CinemaAccessorTest
     public void AddBooking_GivenNewBookingIdWithSameIdAsExitingBooking_ThrowsException()
     {
         // Arrange
-        _sut.CreateCinema("TestMovieName", 2, 3);
+        sut.CreateCinema("TestMovieName", 2, 3);
 
         // Act
-        _sut.AddBooking(new Booking("GIC1234", 4));
+        sut.AddBooking(new Booking("GIC1234", 4));
 
         // Act & Assert
-        var exception = Should.Throw<Exception>(() => _sut.AddBooking(new Booking("GIC1234", 9)));
+        var exception = Should.Throw<Exception>(() => sut.AddBooking(new Booking("GIC1234", 9)));
         exception.Message.ShouldBe("Exception occurred as booking already exist for booking id: GIC1234 !");
         
     }
@@ -114,11 +114,11 @@ public class CinemaAccessorTest
     public void TryGetBooking_GivenExistingBookingId_ReturnsSameBooking()
     {
         // Arrange
-        _sut.CreateCinema("TestMovieName", 2, 3);
-        _sut.AddBooking(new Booking("GIC1234", 4));
+        sut.CreateCinema("TestMovieName", 2, 3);
+        sut.AddBooking(new Booking("GIC1234", 4));
 
         // Act
-        var result = _sut.TryGetBooking("GIC1234");
+        var result = sut.TryGetBooking("GIC1234");
 
         // Assert
         result.ShouldNotBeNull();
@@ -130,11 +130,11 @@ public class CinemaAccessorTest
     public void TryGetBooking_GivenNonExistingBookingId_ReturnsNull()
     {
         // Arrange
-        _sut.CreateCinema("TestMovieName", 2, 3);
-        _sut.AddBooking(new Booking("GIC1234", 4));
+        sut.CreateCinema("TestMovieName", 2, 3);
+        sut.AddBooking(new Booking("GIC1234", 4));
 
         // Act
-        var result = _sut.TryGetBooking("1245GIC1234");
+        var result = sut.TryGetBooking("1245GIC1234");
 
         // Assert
         result.ShouldBeNull();

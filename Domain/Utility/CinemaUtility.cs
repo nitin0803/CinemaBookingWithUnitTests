@@ -29,7 +29,6 @@ public static class CinemaUtility
         public const string TicketsReserved = "Successfully reserved {0} {1} tickets.";
         public const string BookingIdConfirmed = "Booking id: {0} confirmed.";
         public const string SeatsAvailabilityAlert = "Sorry, there are only {0} seats available.";
-        public const string NoBookingFound = "Sorry, no booking Found for entered booking id: {0}";
     }
 
     public struct MenuItem
@@ -51,6 +50,7 @@ public static class CinemaUtility
         public const string InvalidNumberOfTickets = "Please, enter number of tickets as positive integer value";
         public const string InvalidSeatingPosition = "New seating position is not valid! Please try again:";
         public const string InvalidBookingIdFormat = "Entered booking id is not in correct format, please try again!";
+        public const string NoBookingFound = "Sorry, no booking Found for entered booking id: {0}";
     }
 
     public struct ExceptionMessage
@@ -76,7 +76,7 @@ public static class CinemaUtility
     {
         var lastBookingNumber = currentBookings.Count == 0
             ? 0
-            : Convert.ToInt32((string?)currentBookings.Last().BookingId.Substring(3));
+            : Convert.ToInt32(currentBookings.Last().BookingId.Substring(3));
 
         return "GIC" + (lastBookingNumber + 1).ToString("D4");
     }

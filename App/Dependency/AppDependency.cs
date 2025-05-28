@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Configuration;
+using NLog.Extensions.Logging;
 using Service.MenuItemSelection;
 using Service.Screen;
 using Service.SeatSelection;
@@ -32,7 +33,8 @@ public static class AppDependency
             .AddSingleton(config)
             .AddLogging(loggerBuilder =>
             {
-                loggerBuilder.AddConfiguration();
+                loggerBuilder.AddConfiguration(new ConfigurationManager());
+                loggerBuilder.AddNLog();
             })
             .BuildServiceProvider();
         return buildServiceProvider;

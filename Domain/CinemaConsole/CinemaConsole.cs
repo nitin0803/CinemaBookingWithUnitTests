@@ -2,22 +2,27 @@
 
 public class CinemaConsole : ICinemaConsole
 {
-    public string DefineCinema()
+    public string? DefineCinema()
     {
         return Console.ReadLine();
     }
 
-    public string SelectMenuItem()
+    public string? SelectMenuItem()
     {
         return Console.ReadLine();
     }
 
-    public string EnterNumberOfTicketsToBook()
+    public string? ReadNumberOfTicketsToBook()
     {
         return Console.ReadLine();
     }
 
-    public string EnterNewSeatPosition()
+    public string? ReadNewSeatPosition()
+    {
+        return Console.ReadLine();
+    }
+    
+    public string? ReadBookingId()
     {
         return Console.ReadLine();
     }

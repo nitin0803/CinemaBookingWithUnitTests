@@ -9,7 +9,7 @@ public class ExitService : IMenuItemSelectionService
 
     public void Handle(MenuItemOption menuItemOption)
     {
-        Console.WriteLine((string?)CinemaUtility.AppMessage.ThankYou);
+        Console.WriteLine(CinemaUtility.AppMessage.ThankYou);
         Console.WriteLine();
     }
 }

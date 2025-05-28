@@ -2,10 +2,11 @@
 
 public interface ICinemaConsole
 {
-    string DefineCinema();
-    string SelectMenuItem();
-    string EnterNumberOfTicketsToBook();
-    string EnterNewSeatPosition();
+    string? DefineCinema();
+    string? SelectMenuItem();
+    string? ReadNumberOfTicketsToBook();
+    string? ReadNewSeatPosition();
+    string? ReadBookingId();
     void WriteLine(string message);
     void WriteEmptyLine();
 }

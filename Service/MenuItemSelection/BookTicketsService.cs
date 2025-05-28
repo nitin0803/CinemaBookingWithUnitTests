@@ -3,8 +3,10 @@ using Domain.CinemaConsole;
 using Domain.Enums;
 using Domain.Utility;
 using Domain.Validator;
+using Microsoft.Extensions.Logging;
 using Service.Screen;
 using Service.SeatSelection;
+using static System.String;
 
 namespace Service.MenuItemSelection;
 
@@ -12,7 +14,8 @@ public class BookTicketsService(
     ICinemaConsole cinemaConsole,
     ICinemaAccessor cinemaAccessor,
     ISeatSelectionService seatSelectionService,
-    IScreenService screenService) : IMenuItemSelectionService
+    IScreenService screenService,
+    ILogger<CinemaAccessor> logger) : IMenuItemSelectionService
 {
     public bool IsResponsible(MenuItemOption menuItemOption) => menuItemOption == MenuItemOption.BookTickets;
 
@@ -20,14 +23,15 @@ public class BookTicketsService(
     {
         cinemaConsole.WriteLine((CinemaUtility.AppMessage.NumberOfTickets + CinemaUtility.AppMessage.Blank));
 
-        var numberOfTicketsToBookInput = cinemaConsole.EnterNumberOfTicketsToBook();
+        var numberOfTicketsToBookInput = cinemaConsole.ReadNumberOfTicketsToBook();
         cinemaConsole.WriteEmptyLine();
-        if (string.IsNullOrWhiteSpace(numberOfTicketsToBookInput)) return;
+        if (IsNullOrWhiteSpace(numberOfTicketsToBookInput)) return;
 
         while (!CinemaValidator.IsNumberOfTicketsToBookValid(numberOfTicketsToBookInput))
         {
             cinemaConsole.WriteLine(CinemaUtility.ValidationMessage.InvalidNumberOfTickets);
-            numberOfTicketsToBookInput = cinemaConsole.EnterNumberOfTicketsToBook();
+            logger.LogError(CinemaUtility.ValidationMessage.InvalidNumberOfTickets);
+            numberOfTicketsToBookInput = cinemaConsole.ReadNumberOfTicketsToBook();
             cinemaConsole.WriteEmptyLine();
         }
 
@@ -38,22 +42,22 @@ public class BookTicketsService(
 
         if (numberOfTickets > availableSeats)
         {
-            cinemaConsole.WriteLine(String.Format(CinemaUtility.AppMessage.SeatsAvailabilityAlert, availableSeats.ToString()));
+            cinemaConsole.WriteLine(Format(CinemaUtility.AppMessage.SeatsAvailabilityAlert, availableSeats.ToString()));
             cinemaConsole.WriteEmptyLine();
             return;
         }
 
         var newBookingId = seatSelectionService.ReserveSeats(numberOfTickets);
-        cinemaConsole.WriteLine(String.Format(CinemaUtility.AppMessage.TicketsReserved, numberOfTickets, cinema.Movie));
+        cinemaConsole.WriteLine(Format(CinemaUtility.AppMessage.TicketsReserved, numberOfTickets, cinema.Movie));
         ShowScreen(newBookingId);
 
         cinemaConsole.WriteLine(CinemaUtility.AppMessage.AcceptOrNewSeatSelection);
 
-        var newSeatPosition = cinemaConsole.EnterNewSeatPosition();
+        var newSeatPosition = cinemaConsole.ReadNewSeatPosition();
         cinemaConsole.WriteEmptyLine();
         if (HasUserAcceptedSeatSelection(newSeatPosition))
         {
-            ConfirmSeats(newBookingId);
+            ConfirmSeats(newBookingId!);
             return;
         }
 
@@ -62,36 +66,37 @@ public class BookTicketsService(
             while (!CinemaValidator.IsNewSeatPositionValid(cinema.HallLayOut.RowLayOuts, newSeatPosition!))
             {
                 cinemaConsole.WriteLine(CinemaUtility.ValidationMessage.InvalidSeatingPosition);
-                newSeatPosition = cinemaConsole.EnterNewSeatPosition();
+                newSeatPosition = cinemaConsole.ReadNewSeatPosition();
                 cinemaConsole.WriteEmptyLine();
             }
 
-            seatSelectionService.FreeSeats(newBookingId);
+            seatSelectionService.FreeSeats(newBookingId!);
 
             newBookingId = seatSelectionService.ReserveSeats(numberOfTickets, newSeatPosition);
             ShowScreen(newBookingId);
 
             cinemaConsole.WriteLine(CinemaUtility.AppMessage.AcceptOrNewSeatSelection);
-            newSeatPosition = cinemaConsole.EnterNewSeatPosition();
+            newSeatPosition = cinemaConsole.ReadNewSeatPosition();
             cinemaConsole.WriteEmptyLine();
         }
 
-        ConfirmSeats(newBookingId);
+        ConfirmSeats(newBookingId!);
     }
 
     private bool HasUserAcceptedSeatSelection(string? newSeatPosition)
     {
-        return string.IsNullOrWhiteSpace(newSeatPosition);
+        return IsNullOrWhiteSpace(newSeatPosition);
     }
 
     private void ConfirmSeats(string newBookingId)
     {
         seatSelectionService.ConfirmSeats(newBookingId);
-        cinemaConsole.WriteLine(string.Format(CinemaUtility.AppMessage.BookingIdConfirmed, newBookingId));
+        logger.LogInformation($"User confirmed seats for booking id: {newBookingId}");
+        cinemaConsole.WriteLine(Format(CinemaUtility.AppMessage.BookingIdConfirmed, newBookingId));
         cinemaConsole.WriteEmptyLine();
     }
 
-    private void ShowScreen(string newBookingId)
+    private void ShowScreen(string? newBookingId)
     {
         screenService.Show(newBookingId);
         cinemaConsole.WriteEmptyLine();

@@ -8,7 +8,7 @@ public class Seat(int seatNumber)
     public SeatStatus Status { get; private set; } = SeatStatus.Empty;
     public string? BookingId { get; private set; }
 
-    public void Update(SeatStatus seatStatus, string bookingId)
+    public void Update(SeatStatus seatStatus, string? bookingId)
     {
         Status = seatStatus;
         BookingId = bookingId;

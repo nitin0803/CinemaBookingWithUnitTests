@@ -2,5 +2,5 @@
 
 public interface IScreenService
 {
-    void Show(string currentBookingId);
+    void Show(string? currentBookingId);
 }

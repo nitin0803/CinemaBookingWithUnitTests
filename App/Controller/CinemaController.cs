@@ -3,7 +3,6 @@ using Domain.CinemaConsole;
 using Domain.Enums;
 using Domain.Utility;
 using Domain.Validator;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Service.MenuItemSelection;
 
@@ -34,7 +33,7 @@ public class CinemaController(
         var seatsPerRow = int.Parse(inputArray[2]);
 
         var cinema = cinemaAccessor.CreateCinema(inputArray[0], rows, seatsPerRow);
-        logger.Log(LogLevel.Information, $"Cinema created as Movie name: {cinema.Movie}, rows: {cinema.TotalRows}, seatsPerRow: {cinema.SeatsPerRow}");
+        logger.LogInformation($"Cinema created as Movie name: {cinema.Movie}, rows: {cinema.TotalRows}, seatsPerRow: {cinema.SeatsPerRow}");
 
         var menuItemOption = MenuItemOption.None;
         while (menuItemOption != MenuItemOption.Exit)
@@ -58,6 +57,8 @@ public class CinemaController(
                 menuItemOption = MenuItemOption.None;
                 continue;
             }
+            
+            logger.LogInformation($"User selected menu item option: {menuItemOption}");
 
             var menuItemSelectionService = menuItemSelectionServices
                 .Single(s => s.IsResponsible(menuItemOption));

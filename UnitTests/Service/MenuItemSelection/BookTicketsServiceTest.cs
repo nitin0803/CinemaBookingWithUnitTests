@@ -1,6 +1,7 @@
 ﻿using Domain.Accessor;
 using Domain.CinemaConsole;
 using Domain.Enums;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Service.MenuItemSelection;
 using Service.Screen;
@@ -13,18 +14,20 @@ namespace UnitTests.Service.MenuItemSelection;
 public class BookTicketsServiceTest
 {
     private readonly Mock<ICinemaConsole> cinemaConsoleMock = new();
-    private readonly Mock<ICinemaAccessor> _cinemaAccessorMock = new();
-    private readonly Mock<ISeatSelectionService> _seatSelectionServiceMock = new();
-    private readonly Mock<IScreenService> _screenServiceMock = new();
-    private readonly BookTicketsService _sut;
+    private readonly Mock<ICinemaAccessor> cinemaAccessorMock = new();
+    private readonly Mock<ISeatSelectionService> seatSelectionServiceMock = new();
+    private readonly Mock<IScreenService> screenServiceMock = new();
+    private readonly Mock<ILogger<CinemaAccessor>> loggerMock =new();
+    private readonly BookTicketsService sut;
 
     public BookTicketsServiceTest()
     {
-        _sut = new BookTicketsService(
+        sut = new BookTicketsService(
             cinemaConsoleMock.Object,
-            _cinemaAccessorMock.Object,
-            _seatSelectionServiceMock.Object,
-            _screenServiceMock.Object);
+            cinemaAccessorMock.Object,
+            seatSelectionServiceMock.Object,
+            screenServiceMock.Object,
+            loggerMock.Object);
     }
 
     [TestMethod]
@@ -36,7 +39,7 @@ public class BookTicketsServiceTest
         bool expectedResult)
     {
         // Arrange & Act
-        var result = _sut.IsResponsible(menuItemOption);
+        var result = sut.IsResponsible(menuItemOption);
 
         // Assert
         result.ShouldBe(expectedResult);

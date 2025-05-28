@@ -11,6 +11,8 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.4.25258.110" />
       <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0-preview.4.25258.110" />
       <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.4.25258.110" />
+      <PackageReference Include="NLog" Version="6.0.0-rc1" />
+      <PackageReference Include="NLog.Extensions.Logging" Version="5.4.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -20,6 +22,9 @@
 
     <ItemGroup>
       <None Update="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="NLog.config">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

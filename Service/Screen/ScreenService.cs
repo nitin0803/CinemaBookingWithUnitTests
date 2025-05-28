@@ -9,7 +9,7 @@ namespace Service.Screen;
 public class ScreenService(
     ICinemaAccessor cinemaAccessor) : IScreenService
 {
-    public void Show(string currentBookingId)
+    public void Show(string? currentBookingId)
     {
         var cinema = cinemaAccessor.GetCinema();
         var seatsPerRow = cinema.SeatsPerRow;
@@ -51,7 +51,7 @@ public class ScreenService(
         Console.WriteLine();
     }
 
-    private static string GetSeatSymbol(Seat seat, string currentBookingId)
+    private static string GetSeatSymbol(Seat seat, string? currentBookingId)
     {
         return seat switch
         {

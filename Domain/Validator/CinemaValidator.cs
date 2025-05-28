@@ -19,7 +19,7 @@ public static class CinemaValidator
 
         if (cinemaValues[0].Length > 50)
         {
-            System.Console.WriteLine(CinemaUtility.ValidationMessage.MovieNameExceed);
+            Console.WriteLine(CinemaUtility.ValidationMessage.MovieNameExceed);
             return false;
         }
 
@@ -30,9 +30,9 @@ public static class CinemaValidator
         return true;
     }
 
-    public static bool IsBookingIdValid(string bookingId)
+    public static bool IsBookingIdValid(string? bookingId)
     {
-        return Regex.IsMatch(bookingId, CinemaUtility.RegexPattern.BookingId);
+        return bookingId != null && Regex.IsMatch(bookingId, CinemaUtility.RegexPattern.BookingId);
     }
 
     public static bool IsNewSeatPositionValid(IReadOnlyList<RowLayOut> rowLayouts, string newSeatPosition)
@@ -73,13 +73,13 @@ public static class CinemaValidator
     {
         if (!int.TryParse(inputArray[2], out var seatsPerRow))
         {
-            System.Console.WriteLine(CinemaUtility.ValidationMessage.InvalidSeatsPerRow);
+            Console.WriteLine(CinemaUtility.ValidationMessage.InvalidSeatsPerRow);
             return false;
         }
 
         if (seatsPerRow is < 1 or > 50)
         {
-            System.Console.WriteLine(CinemaUtility.ValidationMessage.SeatsPerRowRangeExceed);
+            Console.WriteLine(CinemaUtility.ValidationMessage.SeatsPerRowRangeExceed);
             return false;
         }
 
@@ -90,13 +90,13 @@ public static class CinemaValidator
     {
         if (!int.TryParse(inputArray[1], out var rows))
         {
-            System.Console.WriteLine(CinemaUtility.ValidationMessage.InvalidRow);
+            Console.WriteLine(CinemaUtility.ValidationMessage.InvalidRow);
             return false;
         }
 
         if (rows is < 1 or > 26)
         {
-            System.Console.WriteLine(CinemaUtility.ValidationMessage.RowRangeExceed);
+            Console.WriteLine(CinemaUtility.ValidationMessage.RowRangeExceed);
             return false;
         }
 

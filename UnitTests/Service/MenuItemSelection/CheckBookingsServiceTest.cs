@@ -1,5 +1,7 @@
 ﻿using Domain.Accessor;
+using Domain.CinemaConsole;
 using Domain.Enums;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Service.MenuItemSelection;
 using Service.Screen;
@@ -12,13 +14,17 @@ public class CheckBookingsServiceTest
 {
     private readonly Mock<ICinemaAccessor> _cinemaAccessorMock = new();
     private readonly Mock<IScreenService> _screenServiceMock = new();
+    private readonly Mock<ILogger<CinemaAccessor>> loggerMock =new();
+    private readonly Mock<ICinemaConsole> consoleMock =new();
     private readonly CheckBookingsService _sut;
 
     public CheckBookingsServiceTest()
     {
         _sut = new CheckBookingsService(
             _cinemaAccessorMock.Object,
-            _screenServiceMock.Object);
+            _screenServiceMock.Object,
+            consoleMock.Object,
+            loggerMock.Object);
     }
 
     [TestMethod]

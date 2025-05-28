@@ -21,7 +21,7 @@ public class CinemaAccessor(ILogger<CinemaAccessor> logger) : ICinemaAccessor
         {
             Console.WriteLine("Exception occurred as no Cinema available!");
             var exceptionMessage = $"Exception occurred: {e.Message}";
-            logger.Log(LogLevel.Critical, exceptionMessage);
+            logger.LogCritical(exceptionMessage);
             throw;
         }
     }
@@ -36,14 +36,14 @@ public class CinemaAccessor(ILogger<CinemaAccessor> logger) : ICinemaAccessor
         {
             var exceptionMessage =
                 string.Format($"{CinemaUtility.ExceptionMessage.BookingAlreadyExist}", booking.BookingId);
-            logger.Log(LogLevel.Critical, exceptionMessage);
+            logger.LogCritical(exceptionMessage);
             throw new Exception(exceptionMessage);
         }
 
         cinema.AddBooking(booking);
     }
 
-    public Booking? TryGetBooking(string bookingId)
+    public Booking? TryGetBooking(string? bookingId)
     {
         return GetCinema().Bookings.SingleOrDefault(b => b.BookingId == bookingId);
     }
