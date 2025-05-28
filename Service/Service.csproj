@@ -14,8 +14,4 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.4.25258.110" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Cinema\" />
-    </ItemGroup>
-
 </Project>
